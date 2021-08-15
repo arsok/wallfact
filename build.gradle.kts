@@ -26,6 +26,9 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+
+    implementation("org.litote.kmongo:kmongo-coroutine:4.2.8")
+
 }
 
 tasks.create("stage") {
