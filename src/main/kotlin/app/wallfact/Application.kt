@@ -15,7 +15,7 @@ fun main() {
         println(response.content.readUTF8Line(Int.MAX_VALUE))
     }
 
-    val client = KMongo.createClient().coroutine
+    val client = KMongo.createClient(System.getenv("key")).coroutine
     val database = client.getDatabase("wallfactdb")
     val col = database.getCollection<Fact>()
 
