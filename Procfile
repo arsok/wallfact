@@ -1,1 +1,1 @@
-web: ./build/install/wallfact/bin/wallfact
+web: ./build/install/app.wallfact/bin/app.wallfact
