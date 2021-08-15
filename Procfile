@@ -1,0 +1,1 @@
+web: ./build/install/wallfact/bin/wallfact
