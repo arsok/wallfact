@@ -12,7 +12,7 @@ fun main() {
         println(response.content.readUTF8Line(Int.MAX_VALUE))
     }
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(Netty, port = System.getenv("PORT").toInt()) {
         configureRouting()
     }.start(wait = true)
 }
