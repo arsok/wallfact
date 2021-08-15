@@ -3,12 +3,9 @@ package app.wallfact
 import app.wallfact.integration.pixabay.impl.PixabayRepo
 import app.wallfact.model.Fact
 import app.wallfact.plugins.configureRouting
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import kotlinx.coroutines.runBlocking
-import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 
