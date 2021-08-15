@@ -19,9 +19,15 @@ fun main() {
     val database = client.getDatabase("wallfactdb")
     val col = database.getCollection<Fact>()
 
+
     runBlocking {
+        col.insertOne(Fact(10, "Hello", 121))
+
         val facts: List<Fact> = col.find().toList()
-        println(facts)
+
+        for (fact in facts) {
+            println(fact)
+        }
     }
 
     embeddedServer(Netty, port = System.getenv("PORT").toInt()) {
