@@ -29,6 +29,8 @@ dependencies {
 
     implementation( "io.ktor:ktor-client-serialization:$ktorVersion")
 
+    implementation("org.litote.kmongo:kmongo-coroutine:4.2.8")
+
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testImplementation("io.insert-koin:koin-test:$koinVersion")
