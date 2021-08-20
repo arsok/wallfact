@@ -2,6 +2,7 @@ package app.wallfact.plugins
 
 import app.wallfact.integration.pixabay.model.PixabayResponse
 import app.wallfact.integration.pixabay.repo.PixabayRepo
+import app.wallfact.integration.pixabay.service.PixabayService
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.response.respond
@@ -11,7 +12,7 @@ import io.ktor.routing.routing
 import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
-    val pixabayRepo: PixabayRepo by inject()
+    val pixabayService: PixabayService by inject()
 
     routing {
         get("/") {
@@ -20,8 +21,8 @@ fun Application.configureRouting() {
 
         get("/img") {
             try {
-                val img = pixabayRepo.getImage("test")
-                call.respond<PixabayResponse>(img)
+                val img = pixabayService.forceWriteToMongo()
+                call.respond("")
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -2,6 +2,7 @@ package app.wallfact.integration.pixabay
 
 import app.wallfact.integration.pixabay.client.PixabayClient
 import app.wallfact.integration.pixabay.repo.PixabayRepo
+import app.wallfact.integration.pixabay.service.PixabayService
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JsonFeature
@@ -28,6 +29,11 @@ val pixabayModule = module {
     single {
         val pixabayClient: PixabayClient by inject()
         PixabayRepo(pixabayClient)
+    }
+
+    single {
+        val pixabayRepo: PixabayRepo by inject()
+        PixabayService(pixabayRepo)
     }
 }
 
