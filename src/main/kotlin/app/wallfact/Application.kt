@@ -1,18 +1,17 @@
 package app.wallfact
 
-import app.wallfact.integration.pixabay.impl.PixabayRepo
+import app.wallfact.integration.pixabay.pixabayModule
 import app.wallfact.plugins.configureRouting
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kotlinx.coroutines.runBlocking
+import org.koin.core.context.startKoin
 
 fun main() {
-    runBlocking {
-        val response = PixabayRepo().testKtorClient()
-        println(response.content.readUTF8Line(Int.MAX_VALUE))
+    startKoin {
+        modules(pixabayModule)
     }
 
-    embeddedServer(Netty, port = System.getenv("PORT").toInt()) {
+    embeddedServer(Netty, port = System.getenv("PORT")?.toInt() ?: "8080".toInt()) {
         configureRouting()
     }.start(wait = true)
 }
