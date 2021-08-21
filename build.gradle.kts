@@ -1,6 +1,9 @@
-val ktorVersion: String by project
-val kotlinVersion: String by project
+val ktorVersion = "1.6.2"
+val kotlinVersion = "1.5.21"
 val koinVersion = "3.1.2"
+val logbackVersion = "1.2.3"
+val groovyVersion = "3.0.8"
+val mongoVersion = "4.2.8"
 
 plugins {
     application
@@ -29,7 +32,10 @@ dependencies {
 
     implementation( "io.ktor:ktor-client-serialization:$ktorVersion")
 
-    implementation("org.litote.kmongo:kmongo-coroutine:4.2.8")
+    implementation("org.litote.kmongo:kmongo-coroutine:$mongoVersion")
+
+    implementation("org.codehaus.groovy:groovy:$groovyVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")

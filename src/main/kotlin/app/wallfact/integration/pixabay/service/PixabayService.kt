@@ -1,30 +1,34 @@
 package app.wallfact.integration.pixabay.service
 
+import app.wallfact.integration.pixabay.model.PixabayResponse
 import app.wallfact.integration.pixabay.repo.PixabayRepo
-import kotlin.concurrent.fixedRateTimer
-import kotlinx.coroutines.runBlocking
+import kotlin.random.Random
+import kotlinx.coroutines.reactive.awaitFirst
+import org.bson.BsonDocument
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.slf4j.LoggerFactory
 
-class PixabayService(private val pixabayRepo: PixabayRepo) {
+class PixabayService(
+    private val pixabayRepo: PixabayRepo,
+    private val database: CoroutineDatabase
+) {
+    private val log = LoggerFactory.getLogger(this::javaClass.get())
 
-    init {
-        createPixabayFetcher()
+    suspend fun getFiftyNewImages(): PixabayResponse {
+        return pixabayRepo.getImages(50, "new")
     }
 
-    private fun createPixabayFetcher() {
-        fixedRateTimer(period = 86_400_000L, name = "Pixabay-0") {
-            runBlocking {
-                val (_, _, hits) = pixabayRepo.getImages(50, "new")
-                var imageUrls = hits.map { it.largeImageURL }
-            }
-        }
-    }
+    suspend fun getRandomImageFromDb(): ByteArray {
+        log.info("Retrieving random image from database")
+        val collection = database.getCollection<BsonDocument>("images")
+        val total = collection.collection.countDocuments().awaitFirst().toInt()
 
-    fun forceWriteToMongo() {
-        runBlocking {
-            val (_, _, hits) = pixabayRepo.getImages(50, "new")
-            var imageUrls = hits.map { it.largeImageURL }
-
-
-        }
+        return collection.find()
+            .limit(-1)
+            .skip(Random.nextInt(total))
+            .first()
+            ?.getBinary("image")
+            ?.data
+            ?: byteArrayOf()
     }
 }
