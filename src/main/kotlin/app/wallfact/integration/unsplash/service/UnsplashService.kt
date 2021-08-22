@@ -1,21 +1,21 @@
-package app.wallfact.integration.pixabay.service
+package app.wallfact.integration.unsplash.service
 
-import app.wallfact.integration.pixabay.model.PixabayResponse
-import app.wallfact.integration.pixabay.repo.PixabayRepo
+import app.wallfact.integration.unsplash.model.UnsplashImage
+import app.wallfact.integration.unsplash.repo.UnsplashRepo
 import kotlin.random.Random
 import kotlinx.coroutines.reactive.awaitFirst
 import org.bson.BsonDocument
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.LoggerFactory
 
-class PixabayService(
-    private val pixabayRepo: PixabayRepo,
+class UnsplashService(
+    private val unsplashRepo: UnsplashRepo,
     private val database: CoroutineDatabase
 ) {
     private val log = LoggerFactory.getLogger(this::javaClass.get())
 
-    suspend fun getFiftyNewImages(): PixabayResponse {
-        return pixabayRepo.getImages(50, "new")
+    suspend fun getFiftyNewImages(): List<UnsplashImage> {
+        return unsplashRepo.listImages(50)
     }
 
     suspend fun getRandomImageFromDb(): ByteArray {
@@ -30,5 +30,10 @@ class PixabayService(
             ?.getBinary("image")
             ?.data
             ?: byteArrayOf()
+    }
+
+    suspend fun clearDatabase() {
+        val collection = database.getCollection<BsonDocument>("images")
+        collection.deleteMany()
     }
 }

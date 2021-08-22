@@ -1,8 +1,10 @@
 package app.wallfact.plugins
 
-import app.wallfact.integration.pixabay.service.PixabayService
+import app.wallfact.integration.unsplash.service.UnsplashService
 import io.ktor.application.Application
 import io.ktor.application.call
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
 import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.get
@@ -10,7 +12,7 @@ import io.ktor.routing.routing
 import org.koin.ktor.ext.inject
 
 fun Application.configureRouting() {
-    val pixabayService: PixabayService by inject()
+    val unsplashService: UnsplashService by inject()
 
     routing {
         get("/") {
@@ -18,8 +20,13 @@ fun Application.configureRouting() {
         }
 
         get("/img") {
-            val image = pixabayService.getRandomImageFromDb()
+            val image = unsplashService.getRandomImageFromDb()
             call.respondBytes(image)
+        }
+
+        get("/clear") {
+            unsplashService.clearDatabase()
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

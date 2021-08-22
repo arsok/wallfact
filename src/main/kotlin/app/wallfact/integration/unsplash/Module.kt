@@ -1,9 +1,9 @@
-package app.wallfact.integration.pixabay
+package app.wallfact.integration.unsplash
 
-import app.wallfact.integration.pixabay.client.PixabayClient
-import app.wallfact.integration.pixabay.repo.PixabayRepo
-import app.wallfact.integration.pixabay.service.PixabayService
-import app.wallfact.job.pixabay.PixabayDailyImageFetcherJob
+import app.wallfact.integration.unsplash.client.UnsplashClient
+import app.wallfact.integration.unsplash.repo.UnsplashRepo
+import app.wallfact.integration.unsplash.service.UnsplashService
+import app.wallfact.job.unsplash.UnsplashDailyImageFetcherJob
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JsonFeature
@@ -25,14 +25,14 @@ private val client = HttpClient {
     }
 }
 
-val pixabayModule = module {
+val unsplashModule = module {
     single {
-        PixabayClient(client, "${prop("integration.pixabay.baseUrl")}?key=${prop("integration.pixabay.key")}")
+        UnsplashClient(client, prop("integration.unsplash.baseUrl"), prop("integration.unsplash.key"))
     }
 
     single {
-        val pixabayClient: PixabayClient by inject()
-        PixabayRepo(pixabayClient)
+        val unsplashClient: UnsplashClient by inject()
+        UnsplashRepo(unsplashClient)
     }
 
     single {
@@ -41,15 +41,15 @@ val pixabayModule = module {
     }
 
     single {
-        val pixabayRepo: PixabayRepo by inject()
+        val unsplashRepo: UnsplashRepo by inject()
         val database: CoroutineDatabase by inject()
-        PixabayService(pixabayRepo, database)
+        UnsplashService(unsplashRepo, database)
     }
 
     single(createdAtStart = true) {
-        val pixabayService: PixabayService by inject()
+        val unsplashService: UnsplashService by inject()
         val database: CoroutineDatabase by inject()
-        PixabayDailyImageFetcherJob(pixabayService, database)
+        UnsplashDailyImageFetcherJob(unsplashService, database)
     }
 }
 
