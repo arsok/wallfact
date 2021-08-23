@@ -27,7 +27,7 @@ private val client = HttpClient {
 
 val unsplashModule = module {
     single {
-        UnsplashClient(client, prop("integration.unsplash.baseUrl"), prop("integration.unsplash.key"))
+        UnsplashClient(client, prop("integration.unsplash.baseUrl"), System.getenv("UNSPLASH_KEY"))
     }
 
     single {
@@ -36,7 +36,7 @@ val unsplashModule = module {
     }
 
     single {
-        val client = KMongo.createClient().coroutine
+        val client = KMongo.createClient(System.getenv("MONGODB_URI")).coroutine
         client.getDatabase(prop("database.name"))
     }
 
