@@ -14,6 +14,8 @@ class UnsplashDailyImageFetcherJob(
     private val unsplashService: UnsplashService,
     private val database: CoroutineDatabase
 ) : DailyFetcherJob {
+    private val removePreviousImages = true
+
     private val log = LoggerFactory.getLogger(this::javaClass.get())
 
     init {
@@ -22,7 +24,12 @@ class UnsplashDailyImageFetcherJob(
 
     override suspend fun fetch() {
         log.info("Running unsplash import job")
-        val images = unsplashService.getFiftyNewImages()
+        val images = unsplashService.getNewImages(10)
+
+        if (images.isNotEmpty() && removePreviousImages) {
+            log.info("Clearing existing images collection")
+            unsplashService.clearImages()
+        }
 
         val collection = database.getCollection<BsonDocument>("images")
         images.map { BsonDocument("image", BsonBinary(URL(it.urls.regular).readBytes())) }

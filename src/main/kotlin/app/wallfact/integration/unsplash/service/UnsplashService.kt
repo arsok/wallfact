@@ -12,10 +12,11 @@ class UnsplashService(
     private val unsplashRepo: UnsplashRepo,
     private val database: CoroutineDatabase
 ) {
+    private val imagesTheme = "nature"
     private val log = LoggerFactory.getLogger(this::javaClass.get())
 
-    suspend fun getFiftyNewImages(): List<UnsplashImage> {
-        return unsplashRepo.listImages(50)
+    suspend fun getNewImages(count: Int): List<UnsplashImage> {
+        return unsplashRepo.searchImages(count, imagesTheme).results
     }
 
     suspend fun getRandomImageFromDb(): ByteArray {
@@ -32,7 +33,7 @@ class UnsplashService(
             ?: byteArrayOf()
     }
 
-    suspend fun clearDatabase() {
+    suspend fun clearImages() {
         val collection = database.getCollection<BsonDocument>("images")
         collection.deleteMany()
     }

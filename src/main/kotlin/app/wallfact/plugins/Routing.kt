@@ -25,7 +25,7 @@ fun Application.configureRouting() {
         }
 
         get("/clear") {
-            unsplashService.clearDatabase()
+            unsplashService.clearImages()
             call.respond(HttpStatusCode.OK)
         }
     }

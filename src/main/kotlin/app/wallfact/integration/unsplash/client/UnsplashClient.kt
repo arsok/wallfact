@@ -31,7 +31,7 @@ class UnsplashClient(
         return client.get(appendPostfix("$baseUrl/photos/random"))
     }
 
-    private fun appendPostfix(request: String) = "$request&orientation=portrait&client_id=$key"
+    private fun appendPostfix(request: String) = "$request&orientation=portrait&content_filter=high&client_id=$key"
 
     private fun urlEncode(str: String) = URLEncoder.encode(str, UTF_8.name())
 }
