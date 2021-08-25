@@ -20,8 +20,12 @@ fun Application.configureRouting() {
         }
 
         get("/img") {
-            val image = unsplashService.getRandomImageFromDb()
-            call.respondBytes(image)
+            with(call.request.queryParameters) {
+                val (width, height) = this["width"] to this["height"]
+                val image = unsplashService.getRandomCroppedImageFromDb(width?.toInt(), height?.toInt())
+
+                call.respondBytes(image)
+            }
         }
 
         get("/clear") {
