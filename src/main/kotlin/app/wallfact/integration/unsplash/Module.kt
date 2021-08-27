@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.config.HoconApplicationConfig
+import kotlin.time.ExperimentalTime
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -25,6 +26,7 @@ private val client = HttpClient {
     }
 }
 
+@ExperimentalTime
 val unsplashModule = module {
     single {
         UnsplashClient(client, prop("integration.unsplash.baseUrl"), System.getenv("UNSPLASH_KEY"))

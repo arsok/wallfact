@@ -34,6 +34,8 @@ dependencies {
 
     implementation("org.litote.kmongo:kmongo-coroutine:$mongoVersion")
 
+    implementation("io.github.reactivecircus.cache4k:cache4k:0.3.0")
+
     implementation("org.codehaus.groovy:groovy:$groovyVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 

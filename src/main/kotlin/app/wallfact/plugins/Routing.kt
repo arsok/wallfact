@@ -9,8 +9,11 @@ import io.ktor.response.respondBytes
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
+import java.awt.Dimension
+import kotlin.time.ExperimentalTime
 import org.koin.ktor.ext.inject
 
+@ExperimentalTime
 fun Application.configureRouting() {
     val unsplashService: UnsplashService by inject()
 
@@ -21,8 +24,8 @@ fun Application.configureRouting() {
 
         get("/img") {
             with(call.request.queryParameters) {
-                val (width, height) = this["width"] to this["height"]
-                val image = unsplashService.getRandomCroppedImageFromDb(width?.toInt(), height?.toInt())
+                val dimension = Dimension(this["width"]?.toInt() ?: 0, this["height"]?.toInt() ?: 0)
+                val image = unsplashService.getRandomCroppedImageFromDb(dimension)
 
                 call.respondBytes(image)
             }

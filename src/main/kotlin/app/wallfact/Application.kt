@@ -4,8 +4,10 @@ import app.wallfact.integration.unsplash.unsplashModule
 import app.wallfact.plugins.configureRouting
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlin.time.ExperimentalTime
 import org.koin.core.context.startKoin
 
+@ExperimentalTime
 fun main() {
     startKoin {
         modules(unsplashModule)

@@ -4,12 +4,14 @@ import app.wallfact.integration.unsplash.service.UnsplashService
 import app.wallfact.job.DailyFetcherJob
 import java.net.URL
 import kotlin.concurrent.fixedRateTimer
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.runBlocking
 import org.bson.BsonBinary
 import org.bson.BsonDocument
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.LoggerFactory
 
+@ExperimentalTime
 class UnsplashDailyImageFetcherJob(
     private val unsplashService: UnsplashService,
     private val database: CoroutineDatabase
@@ -32,7 +34,7 @@ class UnsplashDailyImageFetcherJob(
         }
 
         val collection = database.getCollection<BsonDocument>("images")
-        images.map { BsonDocument("image", BsonBinary(URL(it.urls.regular).readBytes())) }
+        images.map { BsonDocument("image", BsonBinary(URL(it.urls.full).readBytes())) }
             .onEach { collection.insertOne(it) }
 
         log.info("Unsplash import job completed")
