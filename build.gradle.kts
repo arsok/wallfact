@@ -4,6 +4,8 @@ val koinVersion = "3.1.2"
 val logbackVersion = "1.2.3"
 val groovyVersion = "3.0.8"
 val mongoVersion = "4.2.8"
+val cache4kVersion = "0.3.0"
+val commonsTextVersion = "1.9"
 
 plugins {
     application
@@ -27,15 +29,14 @@ dependencies {
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
 
     implementation("io.insert-koin:koin-ktor:$koinVersion")
 
-    implementation( "io.ktor:ktor-client-serialization:$ktorVersion")
-
     implementation("org.litote.kmongo:kmongo-coroutine:$mongoVersion")
+    implementation("io.github.reactivecircus.cache4k:cache4k:$cache4kVersion")
 
-    implementation("io.github.reactivecircus.cache4k:cache4k:0.3.0")
-
+    implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("org.codehaus.groovy:groovy:$groovyVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
@@ -46,4 +47,10 @@ dependencies {
 
 tasks.create("stage") {
     dependsOn("installDist")
+}
+
+tasks.compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
+    }
 }
