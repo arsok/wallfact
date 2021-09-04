@@ -22,7 +22,7 @@ class UnsplashClient(
     }
 
     override suspend fun searchImages(count: Int, query: String): UnsplashSearchResponse {
-        log.info("Searching images from unsplash")
+        log.info("Searching unsplash images")
         return client.get(appendPostfix("$baseUrl/search/photos?query=${urlEncode(query)}&per_page=$count"))
     }
 

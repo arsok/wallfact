@@ -1,15 +1,16 @@
 package app.wallfact.integration.unsplash
 
+import app.wallfact.fact.FactService
 import app.wallfact.integration.unsplash.client.UnsplashClient
 import app.wallfact.integration.unsplash.repo.UnsplashRepo
 import app.wallfact.integration.unsplash.service.UnsplashService
 import app.wallfact.job.unsplash.UnsplashDailyImageFetcherJob
+import app.wallfact.service.ImageService
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.config.HoconApplicationConfig
-import kotlin.time.ExperimentalTime
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
@@ -26,7 +27,6 @@ private val client = HttpClient {
     }
 }
 
-@ExperimentalTime
 val unsplashModule = module {
     single {
         UnsplashClient(client, prop("integration.unsplash.baseUrl"), System.getenv("UNSPLASH_KEY"))
@@ -46,6 +46,17 @@ val unsplashModule = module {
         val unsplashRepo: UnsplashRepo by inject()
         val database: CoroutineDatabase by inject()
         UnsplashService(unsplashRepo, database)
+    }
+
+    single {
+        val database: CoroutineDatabase by inject()
+        FactService(database)
+    }
+
+    single {
+        val unsplashService: UnsplashService by inject()
+        val factService: FactService by inject()
+        ImageService(unsplashService, factService)
     }
 
     single(createdAtStart = true) {
