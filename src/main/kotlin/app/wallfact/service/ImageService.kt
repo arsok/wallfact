@@ -65,13 +65,11 @@ class ImageService(
     }
 
     private fun ByteArray.toCroppedImage(dimension: Dimension): BufferedImage = with(dimension) {
-        return if (isEmpty() || width < 240 || height < 240) ImageIO.read(inputStream())
-        else crop(this)
+        if (width !in 240..3000 || height !in 240..3000) {
+            setSize(1080, 1920)
+        }
+        return crop(this)
     }
-
-    private fun ByteArray.toBsonDocument(hash: String) = BsonDocument("image", BsonBinary(this))
-        .append("hash", BsonString(hash))
-        .append("created_at", BsonTimestamp(System.currentTimeMillis()))
 
     private fun ByteArray.crop(dimension: Dimension): BufferedImage {
         val bufferedImage = ImageIO.read(inputStream())
@@ -154,4 +152,8 @@ class ImageService(
         ImageIO.write(this, "png", it)
         it.toByteArray()
     }
+
+    private fun ByteArray.toBsonDocument(hash: String) = BsonDocument("image", BsonBinary(this))
+        .append("hash", BsonString(hash))
+        .append("created_at", BsonTimestamp(System.currentTimeMillis()))
 }
