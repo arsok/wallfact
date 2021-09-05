@@ -1,5 +1,6 @@
 package app.wallfact.job.unsplash
 
+import app.wallfact.integration.unsplash.model.UnsplashImage
 import app.wallfact.integration.unsplash.service.UnsplashService
 import app.wallfact.job.DailyFetcherJob
 import java.net.URL
@@ -33,11 +34,13 @@ class UnsplashDailyImageFetcherJob(
         }
 
         unsplashService.retrieveFreshImages(10)
-            .map { BsonDocument("image", BsonBinary(URL(it.urls.full).readBytes())) }
+            .map(this::toBsonDocument)
             .onEach { collection.insertOne(it) }
 
         log.info("Unsplash import job completed")
     }
+
+    private fun toBsonDocument(it: UnsplashImage) = BsonDocument("image", BsonBinary(URL(it.urls.full).readBytes()))
 
     private fun createUnsplashFetcher() = fixedRateTimer(period = 86_400_000L, name = "unsplash-job-runner") {
         runBlocking {

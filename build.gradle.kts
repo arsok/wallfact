@@ -4,7 +4,6 @@ val koinVersion = "3.1.2"
 val logbackVersion = "1.2.3"
 val groovyVersion = "3.0.8"
 val mongoVersion = "4.2.8"
-val cache4kVersion = "0.3.0"
 val commonsTextVersion = "1.9"
 
 plugins {
@@ -34,7 +33,6 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:$koinVersion")
 
     implementation("org.litote.kmongo:kmongo-coroutine:$mongoVersion")
-    implementation("io.github.reactivecircus.cache4k:cache4k:$cache4kVersion")
 
     implementation("org.apache.commons:commons-text:$commonsTextVersion")
     implementation("org.codehaus.groovy:groovy:$groovyVersion")
