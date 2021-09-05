@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class UnsplashSearchResponse(val total: Int, val totalPages: Int = 1, val results: List<UnsplashImage>)
 
 @Serializable
-data class UnsplashImage(val width: Int, val height: Int, val urls: Urls)
+data class UnsplashImage(val hash: String? = null, val width: Int, val height: Int, val urls: Urls)
 
 @Serializable
 data class Urls(val raw: String, val full: String, val regular: String)

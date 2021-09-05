@@ -1,8 +1,8 @@
 package app.wallfact.service
 
 import app.wallfact.fact.FactService
+import app.wallfact.integration.unsplash.model.UnsplashImage
 import app.wallfact.integration.unsplash.service.UnsplashService
-import io.github.reactivecircus.cache4k.Cache
 import java.awt.Color
 import java.awt.Color.white
 import java.awt.Dimension
@@ -21,14 +21,21 @@ import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.ByteArrayOutputStream
 import java.lang.ClassLoader.getSystemClassLoader
 import javax.imageio.ImageIO
-import kotlin.time.Duration
+import kotlin.random.Random
 import org.apache.commons.text.WordUtils.wrap
+import org.bson.BsonBinary
+import org.bson.BsonDocument
+import org.bson.BsonString
+import org.bson.BsonTimestamp
+import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kmongo.eq
 import org.slf4j.LoggerFactory
 
 
 class ImageService(
     private val unsplashService: UnsplashService,
-    private val factService: FactService
+    private val factService: FactService,
+    private val database: CoroutineDatabase
 ) {
     private val textColor = white
     private val bubbleColor = Color(99, 99, 102)
@@ -36,23 +43,35 @@ class ImageService(
     private val roboto = createFont(TRUETYPE_FONT, getSystemClassLoader().getResourceAsStream("Roboto.ttf"))
     private val log = LoggerFactory.getLogger(this::javaClass.get())
 
-    private val cache = Cache.Builder()
-        .expireAfterAccess((Duration.hours(24)))
-        .build<String, BufferedImage>()
-
     suspend fun getWallpaper(dimension: Dimension): ByteArray {
-        val imageBytes = unsplashService.getRandomWallpaper()
+        val imagesCache = database.getCollection<BsonDocument>("images_cache")
 
-        return imageBytes.retrieveCroppedImage(dimension)
-            .renderFact()
+        val prefix = Random.nextInt(0, 3).toString()
+        val hash = prefix + dimension.height + dimension.width
+        var image = imagesCache.findOne(UnsplashImage::hash eq hash)
+
+        if (image == null) {
+            val imageBson = unsplashService.getRandomWallpaper()
+                .toCroppedImage(dimension)
+                .renderFact()
+                .toBsonDocument(hash)
+            imagesCache.save(imageBson)
+
+            log.info("Saved rendered image with hash {} to cache", hash)
+            image = imagesCache.findOne(UnsplashImage::hash eq hash)!!
+        } else log.info("Retrieved rendered image with hash {} from cache", hash)
+
+        return image.getBinary("image").data
     }
 
-    private suspend fun ByteArray.retrieveCroppedImage(dimension: Dimension): BufferedImage {
-        with(dimension) {
-            return if (isEmpty() || width < 240 || height < 240) ImageIO.read(inputStream())
-            else cache.get("$this${this@retrieveCroppedImage.size}") { crop(this) }
-        }
+    private fun ByteArray.toCroppedImage(dimension: Dimension): BufferedImage = with(dimension) {
+        return if (isEmpty() || width < 240 || height < 240) ImageIO.read(inputStream())
+        else crop(this)
     }
+
+    private fun ByteArray.toBsonDocument(hash: String) = BsonDocument("image", BsonBinary(this))
+        .append("hash", BsonString(hash))
+        .append("created_at", BsonTimestamp(System.currentTimeMillis()))
 
     private fun ByteArray.crop(dimension: Dimension): BufferedImage {
         val bufferedImage = ImageIO.read(inputStream())
@@ -64,7 +83,7 @@ class ImageService(
 
     private suspend fun BufferedImage.renderFact(): ByteArray {
         val fact = factService.getRandomFact()
-        log.info("Retrieved fact: '$fact'")
+        log.info("Retrieved fact from db with text '{}'", fact)
 
         val image = BufferedImage(width, height, TYPE_INT_ARGB)
 

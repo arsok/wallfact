@@ -56,7 +56,9 @@ val unsplashModule = module {
     single {
         val unsplashService: UnsplashService by inject()
         val factService: FactService by inject()
-        ImageService(unsplashService, factService)
+        val database: CoroutineDatabase by inject()
+
+        ImageService(unsplashService, factService, database)
     }
 
     single(createdAtStart = true) {

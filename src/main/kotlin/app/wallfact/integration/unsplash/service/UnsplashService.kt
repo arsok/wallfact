@@ -17,14 +17,12 @@ class UnsplashService(
     suspend fun retrieveFreshImages(count: Int) = unsplashRepo.searchImages(count, imagesTheme).results
 
     suspend fun getRandomWallpaper(): ByteArray {
-        log.info("Retrieving random image from database")
-
         val first: BsonDocument = database.getCollection<BsonDocument>("images")
             .aggregate<BsonDocument>(listOf(Aggregates.sample(1)))
             .first()
             ?: throw IllegalStateException("Could not get random image from database")
 
-        log.info("Retrieved random image with id ${first.getObjectId("_id").value}")
+        log.info("Retrieved image from db with id {}", first.getObjectId("_id").value)
 
         return first.getBinary("image").data
     }
