@@ -22,6 +22,11 @@ import java.io.ByteArrayOutputStream
 import java.lang.ClassLoader.getSystemClassLoader
 import javax.imageio.ImageIO
 import kotlin.random.Random
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.commons.text.WordUtils.wrap
 import org.bson.BsonBinary
 import org.bson.BsonDocument
@@ -29,8 +34,6 @@ import org.bson.BsonString
 import org.bson.BsonTimestamp
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
-import org.slf4j.LoggerFactory
-
 
 class ImageService(
     private val unsplashService: UnsplashService,
@@ -39,52 +42,43 @@ class ImageService(
 ) {
     private val textColor = white
     private val bubbleColor = Color(99, 99, 102)
-
     private val roboto = createFont(TRUETYPE_FONT, getSystemClassLoader().getResourceAsStream("Roboto.ttf"))
-    private val log = LoggerFactory.getLogger(this::javaClass.get())
 
-    suspend fun getWallpaper(dimension: Dimension): ByteArray {
+    suspend fun getWallpaper(dimension: Dimension): ByteArray = withContext(Default) {
         val imagesCache = database.getCollection<BsonDocument>("images_cache")
 
-        val prefix = Random.nextInt(0, 3).toString()
-        val hash = prefix + dimension.height + dimension.width
+        val hash = Random.nextInt(0, 3).toString() + dimension.height + dimension.width
         var image = imagesCache.findOne(UnsplashImage::hash eq hash)
 
         if (image == null) {
-            val imageBson = unsplashService.getRandomWallpaper()
-                .toCroppedImage(dimension)
-                .renderFact()
-                .toBsonDocument(hash)
-            imagesCache.save(imageBson)
+            image = getBsonWithFact(dimension, hash)
 
-            log.info("Saved rendered image with hash {} to cache", hash)
-            image = imagesCache.findOne(UnsplashImage::hash eq hash)!!
-        } else log.info("Retrieved rendered image with hash {} from cache", hash)
+            launch(IO) {
+                imagesCache.insertOne(image)
+            }
+        }
 
-        return image.getBinary("image").data
+        image.getBinary("image").data
     }
 
-    private fun ByteArray.toCroppedImage(dimension: Dimension): BufferedImage = with(dimension) {
-        return if (isEmpty() || width < 240 || height < 240) ImageIO.read(inputStream())
-        else crop(this)
+    private suspend fun getBsonWithFact(dimension: Dimension, hash: String): BsonDocument = withContext(Default) {
+        val wallpaper = async { unsplashService.getRandomWallpaper().toCroppedImage(dimension) }
+        val fact = async { factService.getRandomFact() }
+
+        wallpaper.await()
+            .renderFact(fact.await())
+            .toBsonDocument(hash)
     }
 
-    private fun ByteArray.toBsonDocument(hash: String) = BsonDocument("image", BsonBinary(this))
-        .append("hash", BsonString(hash))
-        .append("created_at", BsonTimestamp(System.currentTimeMillis()))
+    private fun ByteArray.toCroppedImage(dimension: Dimension): BufferedImage {
+        if (dimension.width !in 240..3000 || dimension.height !in 240..3000) {
+            dimension.setSize(1080, 1920)
+        }
 
-    private fun ByteArray.crop(dimension: Dimension): BufferedImage {
-        val bufferedImage = ImageIO.read(inputStream())
-
-        return if (bufferedImage.width >= dimension.width && bufferedImage.height >= dimension.height) {
-            bufferedImage.getSubimage(0, 0, dimension.width, dimension.height)
-        } else bufferedImage
+        return ImageIO.read(inputStream()).getSubimage(0, 0, dimension.width, dimension.height)
     }
 
-    private suspend fun BufferedImage.renderFact(): ByteArray {
-        val fact = factService.getRandomFact()
-        log.info("Retrieved fact from db with text '{}'", fact)
-
+    private fun BufferedImage.renderFact(fact: String): ByteArray {
         val image = BufferedImage(width, height, TYPE_INT_ARGB)
 
         val graphics2D = setupBaseGraphics(image, this)
@@ -105,8 +99,7 @@ class ImageService(
         val bubbleY = image.height / 2.0 - (bubbleHeight / 2)
 
         graphics2D.fill(getMovedBubble(bubbleX, bubbleY, path))
-
-        drawText(graphics2D, bubbleX, lineHeight, bubbleY, textToWrite)
+        graphics2D.drawText(bubbleX, lineHeight, bubbleY, textToWrite)
 
         return image.toByteArray()
     }
@@ -139,13 +132,13 @@ class ImageService(
         return path.createTransformedShape(moveTo)
     }
 
-    private fun drawText(graphics: Graphics2D, bubbleX: Double, lineHeight: Int, bubbleY: Double, text: List<String>) {
-        graphics.color = textColor
+    private fun Graphics2D.drawText(bubbleX: Double, lineHeight: Int, bubbleY: Double, text: List<String>) {
+        color = textColor
         val x = bubbleX + lineHeight
         var y = bubbleY + lineHeight * 1.25
 
         for (line in text) {
-            graphics.drawString(line, x.toInt(), y.toInt())
+            drawString(line, x.toInt(), y.toInt())
             y += lineHeight
         }
     }
@@ -154,4 +147,9 @@ class ImageService(
         ImageIO.write(this, "png", it)
         it.toByteArray()
     }
+
+    private fun ByteArray.toBsonDocument(hash: String): BsonDocument =
+        BsonDocument("image", BsonBinary(this@toBsonDocument))
+            .append("hash", BsonString(hash))
+            .append("created_at", BsonTimestamp(System.currentTimeMillis()))
 }
