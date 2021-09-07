@@ -10,9 +10,13 @@ import java.awt.Font.TRUETYPE_FONT
 import java.awt.Font.createFont
 import java.awt.Graphics2D
 import java.awt.RenderingHints.KEY_ANTIALIASING
+import java.awt.RenderingHints.KEY_FRACTIONALMETRICS
 import java.awt.RenderingHints.KEY_RENDERING
+import java.awt.RenderingHints.KEY_TEXT_ANTIALIASING
 import java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+import java.awt.RenderingHints.VALUE_FRACTIONALMETRICS_ON
 import java.awt.RenderingHints.VALUE_RENDER_QUALITY
+import java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON
 import java.awt.Shape
 import java.awt.geom.AffineTransform
 import java.awt.geom.GeneralPath
@@ -42,7 +46,7 @@ class ImageService(
     private val database: CoroutineDatabase
 ) {
     private val textColor = white
-    private val bubbleColor = Color(99, 99, 102)
+    private val bubbleColor = Color(66, 66, 66)
     private val roboto = createFont(TRUETYPE_FONT, getSystemClassLoader().getResourceAsStream("Roboto.ttf"))
 
     suspend fun getWallpaper(dimension: Dimension): ByteArray = withContext(Default) {
@@ -85,7 +89,7 @@ class ImageService(
         val graphics2D = setupBaseGraphics(image, this)
         val lineHeight = graphics2D.fontMetrics.height
 
-        val charWidth = (0.65 * graphics2D.fontMetrics.charWidth('W')).roundToInt()
+        val charWidth = (0.66 * graphics2D.fontMetrics.charWidth('W')).roundToInt()
         val bubbleWidth: Int = (image.width * 0.8).toInt()
 
         val textToWrite = wrap(fact, bubbleWidth / charWidth).split("\n")
@@ -109,7 +113,9 @@ class ImageService(
         drawImage(baseImage, 0, 0, null)
         paint = bubbleColor
         setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON)
+        setRenderingHint(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON)
         setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY)
+        setRenderingHint(KEY_FRACTIONALMETRICS, VALUE_FRACTIONALMETRICS_ON)
         font = roboto.deriveFont(newImage.width / 31f)
     }
 
