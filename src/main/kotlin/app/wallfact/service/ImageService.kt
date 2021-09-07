@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.ByteArrayOutputStream
 import java.lang.ClassLoader.getSystemClassLoader
 import javax.imageio.ImageIO
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
@@ -82,14 +83,14 @@ class ImageService(
         val image = BufferedImage(width, height, TYPE_INT_ARGB)
 
         val graphics2D = setupBaseGraphics(image, this)
-
-        val textToWrite = wrap(fact, 40).split("\n")
-        val lines = textToWrite.size + 1
-
         val lineHeight = graphics2D.fontMetrics.height
 
+        val charWidth = (0.65 * graphics2D.fontMetrics.charWidth('W')).roundToInt()
+        val bubbleWidth: Int = (image.width * 0.8).toInt()
+
+        val textToWrite = wrap(fact, bubbleWidth / charWidth).split("\n")
+        val lines = textToWrite.size + 1
         val bubbleHeight: Int = lineHeight * lines
-        val bubbleWidth: Int = (image.width * 0.85).toInt()
 
         val path = GeneralPath()
         val scale = maxOf(lineHeight / 20, 1)
@@ -109,7 +110,7 @@ class ImageService(
         paint = bubbleColor
         setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON)
         setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY)
-        font = roboto.deriveFont(newImage.width / 30f)
+        font = roboto.deriveFont(newImage.width / 31f)
     }
 
     private fun drawBubble(path: GeneralPath, width: Float, height: Float, scale: Int) {
