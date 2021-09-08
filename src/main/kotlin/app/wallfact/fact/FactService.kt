@@ -6,12 +6,11 @@ import org.apache.commons.lang3.StringUtils.EMPTY
 import org.litote.kmongo.coroutine.CoroutineDatabase
 
 class FactService(private val database: CoroutineDatabase) {
+    private val randomPipeline = listOf(Aggregates.sample(1))
 
-    suspend fun getRandomFact(): String {
-        return database.getCollection<Fact>("facts")
-            .aggregate<Fact>(listOf(Aggregates.sample(1)))
-            .first()
-            ?.content
-            ?: EMPTY
-    }
+    suspend fun getRandomFact(): String = database.getCollection<Fact>("facts")
+        .aggregate<Fact>(randomPipeline)
+        .first()
+        ?.content
+        ?: EMPTY
 }
