@@ -119,19 +119,19 @@ class ImageService(
         font = roboto.deriveFont(newImage.width / 31f)
     }
 
-    private fun drawBubble(path: GeneralPath, width: Float, height: Float, scale: Int) {
-        path.moveTo(scale * 5f, scale * 10f)
-        path.curveTo(scale * 5f, scale * 10f, scale * 7f, scale * 5f, scale * 0f, scale * 0f)
-        path.curveTo(0f, 0f, scale * 12f, 0f, scale * 12f, scale * 5f)
-        path.curveTo(scale * 12f, scale * 5f, scale * 12f, 0f, scale * 20f, 0f)
-        path.lineTo(width - scale * 10, 0f)
-        path.curveTo(width - scale * 10, 0f, width, 0f, width, scale * 10f)
-        path.lineTo(width, height - scale * 10)
-        path.curveTo(width, height - scale * 10, width, height, width - scale * 10, height)
-        path.lineTo(scale * 15f, height)
-        path.curveTo(scale * 15f, height, scale * 5f, height, scale * 5f, height - scale * 10)
-        path.lineTo(scale * 5f, scale * 15f)
-        path.closePath()
+    private fun drawBubble(path: GeneralPath, width: Float, height: Float, scale: Int) = with(path) {
+        moveTo(scale * 5f, scale * 10f)
+        curveTo(scale * 5f, scale * 10f, scale * 7f, scale * 5f, scale * 0f, scale * 0f)
+        curveTo(0f, 0f, scale * 12f, 0f, scale * 12f, scale * 5f)
+        curveTo(scale * 12f, scale * 5f, scale * 12f, 0f, scale * 20f, 0f)
+        lineTo(width - scale * 10, 0f)
+        curveTo(width - scale * 10, 0f, width, 0f, width, scale * 10f)
+        lineTo(width, height - scale * 10)
+        curveTo(width, height - scale * 10, width, height, width - scale * 10, height)
+        lineTo(scale * 15f, height)
+        curveTo(scale * 15f, height, scale * 5f, height, scale * 5f, height - scale * 10)
+        lineTo(scale * 5f, scale * 15f)
+        closePath()
     }
 
     private fun getMovedBubble(bubbleX: Double, bubbleY: Double, path: GeneralPath): Shape {
