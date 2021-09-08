@@ -3,6 +3,9 @@ package app.wallfact.service
 import app.wallfact.fact.FactService
 import app.wallfact.integration.unsplash.model.UnsplashImage
 import app.wallfact.integration.unsplash.service.UnsplashService
+import java.awt.BasicStroke
+import java.awt.BasicStroke.CAP_ROUND
+import java.awt.BasicStroke.JOIN_ROUND
 import java.awt.Color
 import java.awt.Color.white
 import java.awt.Dimension
@@ -19,6 +22,7 @@ import java.awt.RenderingHints.VALUE_RENDER_QUALITY
 import java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON
 import java.awt.Shape
 import java.awt.geom.AffineTransform
+import java.awt.geom.Area
 import java.awt.geom.GeneralPath
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
@@ -103,8 +107,10 @@ class ImageService(
         val bubbleX = image.width / 2.0 - (bubbleWidth / 2)
         val bubbleY = image.height / 2.0 - (bubbleHeight / 2)
 
-        graphics2D.fill(getMovedBubble(bubbleX, bubbleY, path))
+        val movedBubbleShape = getMovedBubbleShape(bubbleX, bubbleY, path)
+        graphics2D.fill(movedBubbleShape)
         graphics2D.drawText(bubbleX, lineHeight, bubbleY, textToWrite)
+        graphics2D.draw(Area(BasicStroke(scale / 2f, CAP_ROUND, JOIN_ROUND).createStrokedShape(movedBubbleShape)))
 
         return image.toByteArray()
     }
@@ -134,7 +140,7 @@ class ImageService(
         closePath()
     }
 
-    private fun getMovedBubble(bubbleX: Double, bubbleY: Double, path: GeneralPath): Shape {
+    private fun getMovedBubbleShape(bubbleX: Double, bubbleY: Double, path: GeneralPath): Shape {
         val moveTo = AffineTransform.getTranslateInstance(bubbleX, bubbleY)
         return path.createTransformedShape(moveTo)
     }
