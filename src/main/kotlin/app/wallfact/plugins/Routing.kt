@@ -20,7 +20,7 @@ fun Application.configureRouting() {
 
         get("/img") {
             with(call.request.queryParameters) {
-                val dimension = Dimension(this["width"]?.toInt() ?: 0, this["height"]?.toInt() ?: 0)
+                val dimension = Dimension(this["width"]?.toInt() ?: 1080, this["height"]?.toInt() ?: 1920)
                 val wallpaper = imageService.getWallpaper(dimension)
 
                 call.respondBytes(wallpaper)
