@@ -38,9 +38,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.text.WordUtils.wrap
 import org.bson.BsonBinary
+import org.bson.BsonDateTime
 import org.bson.BsonDocument
 import org.bson.BsonString
-import org.bson.BsonTimestamp
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.eq
 
@@ -164,5 +164,5 @@ class ImageService(
     private fun ByteArray.toBsonDocument(hash: String): BsonDocument =
         BsonDocument("image", BsonBinary(this@toBsonDocument))
             .append("hash", BsonString(hash))
-            .append("created_at", BsonTimestamp(System.currentTimeMillis()))
+            .append("createdAt", BsonDateTime(System.currentTimeMillis()))
 }
