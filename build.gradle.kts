@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "app.wallfact"
-version = "0.0.1"
+version = "0.5"
 application {
     mainClass.set("app.wallfact.ApplicationKt")
 }
