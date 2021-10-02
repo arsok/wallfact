@@ -1,4 +1,4 @@
-val ktorVersion = "1.6.2"
+val ktorVersion = "1.6.4"
 val kotlinVersion = "1.5.21"
 val koinVersion = "3.1.2"
 val logbackVersion = "1.2.3"
