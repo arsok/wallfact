@@ -3,7 +3,7 @@ val kotlinVersion = "1.5.21"
 val koinVersion = "3.1.2"
 val logbackVersion = "1.2.3"
 val groovyVersion = "3.0.8"
-val mongoVersion = "4.2.8"
+val mongoVersion = "4.3.0"
 val commonsTextVersion = "1.9"
 
 plugins {
