@@ -1,19 +1,19 @@
-val ktorVersion = "1.6.2"
+val ktorVersion = "1.6.4"
 val kotlinVersion = "1.5.21"
 val koinVersion = "3.1.2"
 val logbackVersion = "1.2.3"
 val groovyVersion = "3.0.8"
-val mongoVersion = "4.2.8"
+val mongoVersion = "4.3.0"
 val commonsTextVersion = "1.9"
 
 plugins {
     application
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.31"
     kotlin("plugin.serialization") version "1.5.20"
 }
 
 group = "app.wallfact"
-version = "0.0.1"
+version = "0.5"
 application {
     mainClass.set("app.wallfact.ApplicationKt")
 }
