@@ -25,7 +25,7 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.geom.GeneralPath
 import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_INT_ARGB
+import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.io.ByteArrayOutputStream
 import java.lang.ClassLoader.getSystemClassLoader
 import javax.imageio.ImageIO
@@ -88,7 +88,7 @@ class ImageService(
     }
 
     private fun BufferedImage.renderFact(fact: String): ByteArray {
-        val image = BufferedImage(width, height, TYPE_INT_ARGB)
+        val image = BufferedImage(width, height, TYPE_INT_RGB)
 
         val graphics2D = setupBaseGraphics(image, this)
         val lineHeight = graphics2D.fontMetrics.height
@@ -157,7 +157,7 @@ class ImageService(
     }
 
     private fun BufferedImage.toByteArray() = ByteArrayOutputStream().use {
-        ImageIO.write(this, "png", it)
+        ImageIO.write(this, "jpg", it)
         it.toByteArray()
     }
 
