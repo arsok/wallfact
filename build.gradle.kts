@@ -1,8 +1,8 @@
 val ktorVersion = "1.6.4"
 val kotlinVersion = "1.5.21"
 val koinVersion = "3.1.2"
-val logbackVersion = "1.2.3"
-val groovyVersion = "3.0.8"
+val logbackVersion = "1.4.0"
+val groovyVersion = "3.0.12"
 val mongoVersion = "4.3.0"
 val commonsTextVersion = "1.9"
 
