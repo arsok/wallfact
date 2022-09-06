@@ -20,5 +20,5 @@ class UnsplashService(
         .first()
         ?.getBinary("image")
         ?.data
-        ?: throw IllegalStateException("Could not get random image from database")
+        ?: error("Could not get random image from database")
 }
