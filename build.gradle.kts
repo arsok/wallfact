@@ -9,7 +9,7 @@ val commonsTextVersion = "1.9"
 plugins {
     application
     kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.20"
+    kotlin("plugin.serialization") version "1.5.31"
 }
 
 group = "app.wallfact"
